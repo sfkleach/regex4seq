@@ -1,0 +1,22 @@
+# Taken from https://github.com/readthedocs/readthedocs.org/issues/4912
+
+# Required for all RTD YAML config.
+version: 2
+
+# Set-up for a poetry based installation.
+build:
+  os: ubuntu-22.04
+  tools: {python: "3.10"}
+  jobs:
+    pre_create_environment:
+      - asdf plugin add poetry
+      - asdf install poetry latest
+      - asdf global poetry latest
+      - poetry config virtualenvs.create false
+    post_install:
+      - poetry install
+
+# Build documentation in the docs/ directory with Sphinx
+sphinx:
+  configuration: docs/conf.py
+  fail_on_warning: false
