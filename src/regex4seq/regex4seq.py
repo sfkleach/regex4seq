@@ -21,6 +21,17 @@ class RegEx4Seq(ABC):
             if idx == len(inputSeq):
                 return t.namespace() if namespace else True
         return False
+    
+    def matchAll(self, inputSeq: Sequence[Any]) -> Iterator[SimpleNamespace]:
+        """
+        Returns a generator that will find all matches of the pattern in the
+        inputSeq. Each match is returned as a namespace object that contains
+        the bindings that were captured during the match.
+        """
+        ns = StartCaptureTrail()
+        for idx, t in self._gobble(inputSeq, 0, ns):
+            if idx == len(inputSeq):
+                yield t.namespace()
 
     @abstractmethod
     def _gobble(self, inputSeq: Sequence[Any], idx: int, trail: Trail) -> Iterator[tuple[int, Trail]]:
@@ -91,6 +102,15 @@ class RegEx4Seq(ABC):
         any item.
         """
         return self.concatenate(TestItem(lambda x: True))
+    
+    def var(self, name):
+        return MatchGroup(name, self)
+    
+    def __and__(self, Q):
+        return self.concatenate(Q)
+    
+    def __or__(self, Q):
+        return self.alternate(Q)
 
 
 class Empty(RegEx4Seq):
@@ -163,7 +183,7 @@ class ManyItems(RegEx4Seq):
 
     def _gobble(self, inputSeq: Sequence[Any], idx: int, trail: Trail) -> Iterator[tuple[int, Trail]]:
         """:meta private:"""
-        for i in range(idx, len(inputSeq) + 1):
+        for i in range( len(inputSeq), idx - 1, -1): #range(idx, len(inputSeq) + 1):
             yield i, trail
 
     def repeat(self):
