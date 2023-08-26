@@ -15,7 +15,15 @@ Welcome to RegEx4Seq's documentation!
 Introduction
 ============
 
-Stuff I haven't written.
+[Work in progress as of 26th August 2023]
+
+RegEx4Seq is a pattern matcher that is inspired by regular expressions. It 
+allows you to write patterns that find matches in any sequence of python 
+values, such as lists, tuples or even strings. 
+
+
+
+
 
 Indices and tables
 ==================
