@@ -12,6 +12,13 @@ Welcome to RegEx4Seq's documentation!
 
    regex4seq
 
+.. image:: https://dl.circleci.com/status-badge/img/gh/sfkleach/regex4seq/tree/main.svg?style=svg
+        :target: https://dl.circleci.com/status-badge/redirect/gh/sfkleach/regex4seq/tree/main
+
+.. image:: https://readthedocs.org/projects/regex4seq/badge/?version=latest
+    :target: https://regex4seq.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
 Introduction
 ============
 
