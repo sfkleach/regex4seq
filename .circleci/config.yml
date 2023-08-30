@@ -1,0 +1,18 @@
+version: '2.1'
+orbs:
+  python: circleci/python@2.1.1
+jobs:
+  test:
+    executor: python/default
+    steps:
+      - checkout
+      - python/install-packages:
+          pkg-manager: poetry
+      - run:
+          command: |
+            make test
+          name: Test it
+workflows:
+  main:
+    jobs:
+      - test

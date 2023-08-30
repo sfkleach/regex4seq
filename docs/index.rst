@@ -204,10 +204,15 @@ match. The most direct way is to always include one element like this:
 Other Ways to Match
 ===================
 
-The :code:`matches` method takes three optional arguments that can be used to
+The :code:`matches` method takes four optional arguments that can be used to
 alter the way the pattern is matched.
 
-* :code:`pattern.matches(input-sequence, start=True, end=True, namespace=True)`
+* :code:`pattern.matches(input-sequence, start=True, end=True, namespace=True, all_prefix=None)`
+
+In this section we explore the ways to use these arguments.
+
+Anchored and Unanchored matches
+-------------------------------
 
 Normally :code:`matches` will only return True if the pattern matches the entire
 input-sequence. This is because the search is anchored at both the start and
@@ -226,16 +231,58 @@ To do this, we would set both `start` and `end` to False.
 
    from regex4seq import *
 
-   # This pattern matches a sequence of numbers that are all less than 10.
+   # This pattern matches the sequence "a" followed by "b".
    pattern = Item("a") & Item("b")
 
    pattern.matches("this sequence contains ab somewhere", start=False, end=False)
    # True
 
+Match without binding
+---------------------
+
 Because binding match variables can strongly impact performance, we sometimes want
 to turn off the binding. We can do this by setting the optional argument
 :code:`namespace` to False. Note that the 'suchthat' predicates are still run 
-(although the 'extract' functions will not.) 
+although the 'extract' functions will not be used.
+
+Match with all possible bindings
+--------------------------------
+
+A match variable might actually be bound multiple times throughout a match. 
+Normally only the first match is returned. But we can find all possible matches
+by supplying the all_prefix option. This adds the prefix to the front of the
+match variable to create a variable that is bound to a sequence (deque) of all 
+possible matches.
+
+.. code-block:: python
+
+   from regex4seq import *
+
+   pattern = Item("a").var("match") & Item("b").var("match")
+
+   ns = pattern.matches("this sequence contains ab somewhere", start=False, end=False, all_prefix="all_")
+   ns
+   # namespace(match='a', all_match=deque(['a', 'b']))
+
+
+Find all possible matches
+--------------------------
+
+We can use the method :code:`findAllMatches` to find all possible matches. This
+works by returning a generator of namespace objects (or True if there are no 
+matches). 
+
+.. code:: python
+
+   from regex4seq import *
+
+   pattern = ((Item("a") & Item("b")) | Item("c")).var("match")
+
+   for ns in pattern.findAllMatches("this sequence contains ab somewhere", start=False, end=False):
+      print(ns.match)
+   # c
+   # c
+   # ab
 
 
 

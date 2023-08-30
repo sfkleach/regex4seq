@@ -10,7 +10,7 @@ class RegEx4Seq(ABC):
     of items.
     """
 
-    def matches(self, inputSeq: Sequence[Any], namespace: bool=True, start=True, end=True) -> bool | SimpleNamespace:
+    def matches(self, inputSeq: Sequence[Any], namespace: bool=True, start=True, end=True, all_prefix=None) -> bool | SimpleNamespace:
         """
         Returns truthy if the pattern matches the inputSeq. If namespace is
         set to True, then a namespace object is returned that contains the
@@ -24,19 +24,20 @@ class RegEx4Seq(ABC):
         for start_idx in range(0, 1 if start else len(inputSeq) + 1):
             for idx, t in self._gobble(inputSeq, start_idx, ns):
                 if not(end) or idx == len(inputSeq):
-                    return t.namespace(inputSeq)
+                    return t.namespace(inputSeq, all_prefix=all_prefix)
         return False
 
-    def findAllMatches(self, inputSeq: Sequence[Any]) -> Iterator[SimpleNamespace]:
+    def findAllMatches(self, inputSeq: Sequence[Any], namespace: bool=True, start=True, end=True) -> Iterator[bool | SimpleNamespace]:
         """
         Returns a generator that will find all matches of the pattern in the
         inputSeq. Each match is returned as a namespace object that contains
         the bindings that were captured during the match.
         """
-        ns = StartCaptureTrail()
-        for idx, t in self._gobble(inputSeq, 0, ns):
-            if idx == len(inputSeq):
-                yield t.namespace(inputSeq)
+        ns = StartCaptureTrail() if namespace else DiscardTrail()
+        for start_idx in range(0, 1 if start else len(inputSeq) + 1):
+            for idx, t in self._gobble(inputSeq, start_idx, ns):
+                if not(end) or idx == len(inputSeq):
+                    yield t.namespace(inputSeq)
 
     @abstractmethod
     def _gobble(self, inputSeq: Sequence[Any], idx: int, trail: Trail) -> Iterator[tuple[int, Trail]]:
