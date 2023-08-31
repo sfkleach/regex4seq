@@ -22,7 +22,9 @@ Welcome to RegEx4Seq's documentation!
 Introduction
 ============
 
-[WARNING: This is a work in progress as of 29th Aug 23]
+[WARNING: This is a work in progress as of 31st Aug 23. I'm still working on the
+documentation and the API is still subject to change. But it looks like I will
+be done in a few days.]
 
 RegEx4Seq is a pattern matcher that is inspired by regular expressions. It 
 allows you to write patterns that find matches in any sequence of python 
@@ -167,7 +169,26 @@ can be arbitrary code.
 Constrain current item
 ----------------------
 
+We can require the next item to satisfy an arbitrary condition by using the 
+:code:`IfItem` constructor. This takes a function that takes the current item
+and returns True if the item should be matched. We have actualy already used
+this in previous examples but we're giong to describe it a bit better here.
+
 * :code:`IfItem(func)` - matches an item if :code:`func(item)` returns True.
+
+For example, we could match only uppercase strings like this:
+
+.. code-block:: python
+
+   from regex4seq import IfItem
+
+   # This pattern matches a sequence of strings that are uppercase.
+   pattern = IfItem(lambda x: x.isupper()).repeat()
+
+   pattern.matches(["this", "is", "THE", "ANSWER"])
+   # False
+   pattern.matches(["ALL", "CAPS"])
+   # True
 
 
 Look-ahead to next item

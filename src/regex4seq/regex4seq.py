@@ -84,20 +84,48 @@ class RegEx4Seq(ABC):
         Analogous to P? in regular expressions.
         """
         return Optional(self)
-
-    def thenIfItem(self, predicateFunction):
+  
+    def thenIfItems(self, *predicateFunctions):
         """
-        Given a predicate-function, returns a new pattern that matches the
-        original pattern P followed by an items that satisfies the predicate.
+        Given a series of predicate-functions, returns a new pattern that matches 
+        the original pattern P followed by items that satisfies the predicates
+        in turn.
         """
-        return self.then(IfItem(predicateFunction))
+        P = self
+        for pf in predicateFunctions:
+            P = P.then(IfItem(pf))
+        return P
 
-    def thenItem(self, item):
+    def thenItems(self, *item):
         """
         Given an item, returns a new pattern that matches the
-        original pattern P followed by a value that is equal to the item.
+        original pattern P followed by series of items.
         """
-        return self.then(Item(item))
+        P = self
+        for i in item:
+            P = P.then(Item(i))
+        return P
+    
+    def orItems(self, *item):
+        """
+        Given an item, returns a new pattern that matches the
+        original pattern P followed one of the given items.
+        """
+        P = self
+        for i in item:
+            P = P.otherwise(Item(i))
+        return P
+
+    def orIfItems(self, *pfs):
+        """
+        Given an item, returns a new pattern that matches the
+        original pattern P followed an item that satisfies one of the given
+        predicates.
+        """
+        P = self
+        for pf in pfs:
+            P = P.otherwise(IfItem(pf))
+        return P
 
     def thenAny(self):
         """
@@ -105,6 +133,13 @@ class RegEx4Seq(ABC):
         any item.
         """
         return self.then(IfItem(lambda x: True))
+    
+    def thenMany(self):
+        """
+        Returns a new pattern that matches the original pattern P followed by
+        any number of items.
+        """
+        return self.then(MANY)
 
     def var(self, name, suchthat=None, extract=None):
         return MatchGroup(name, self, suchthat=suchthat, extract=extract)
