@@ -1,0 +1,2 @@
+# packages for RTD to pick up (not used for local dev)
+furo>=2023.8.19
