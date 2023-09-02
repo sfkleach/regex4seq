@@ -257,7 +257,7 @@ Other Ways to Match
 The :code:`matches` method takes four optional arguments that can be used to
 alter the way the pattern is matched.
 
-* :code:`pattern.matches(input-sequence, start=True, end=True, namespace=True, all_prefix=None)`
+* :code:`pattern.matches(input-sequence, start=True, end=True, namespace=True, history=None)`
 
 In this section we explore the ways to use these arguments.
 
@@ -300,9 +300,9 @@ Match with all possible bindings
 
 A match variable might actually be bound multiple times throughout a match. 
 Normally only the first match is returned. But we can find all possible matches
-by supplying the all_prefix option. This adds the prefix to the front of the
-match variable to create a variable that is bound to a sequence (deque) of all 
-possible matches.
+by supplying the `history` option. This is a dictionary that maps variable names
+into their counterparts. These counterparts will be bound to a sequence (deque) 
+of all the matches made to that variable during a successful match.
 
 .. code-block:: python
 
@@ -310,9 +310,9 @@ possible matches.
 
    pattern = Item("a").var("match") & Item("b").var("match")
 
-   ns = pattern.matches("this sequence contains ab somewhere", start=False, end=False, all_prefix="all_")
+   ns = pattern.matches("this sequence contains ab somewhere", start=False, end=False, history={'match':'all_matches'})
    ns
-   # namespace(match='a', all_match=deque(['a', 'b']))
+   # namespace(match='a', all_matches=deque(['a', 'b']))
 
 
 Find all possible matches

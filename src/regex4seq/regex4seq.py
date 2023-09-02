@@ -12,7 +12,7 @@ class RegEx4Seq(ABC, Generic[T]):
     of items.
     """
 
-    def matches(self, inputSeq: Sequence[T], namespace: bool=True, start=True, end=True, all_prefix=None) -> bool | SimpleNamespace:
+    def matches(self, inputSeq: Sequence[T], namespace: bool=True, start=True, end=True, history=None) -> bool | SimpleNamespace:
         """
         Returns truthy if the pattern matches the inputSeq. If namespace is
         set to True, then a namespace object is returned that contains the
@@ -26,7 +26,7 @@ class RegEx4Seq(ABC, Generic[T]):
         for start_idx in range(0, 1 if start else len(inputSeq) + 1):
             for idx, t in self._gobble(inputSeq, start_idx, ns):
                 if not(end) or idx == len(inputSeq):
-                    return t.namespace(inputSeq, all_prefix=all_prefix)
+                    return t.namespace(inputSeq, history=history)
         return False
 
     def findAllMatches(self, inputSeq: Sequence[T], namespace: bool=True, start=True, end=True) -> Iterator[bool | SimpleNamespace]:

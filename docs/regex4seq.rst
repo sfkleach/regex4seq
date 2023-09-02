@@ -5,7 +5,7 @@ Module contents
 ---------------
 
 .. automodule:: regex4seq
-   :members: RegEx4Seq, NONE, ANY, MANY, Item, TestItem, MatchGroup
+   :members: RegEx4Seq, NONE, ANY, MANY, Item, IfItem, Items, IfItems, MatchGroup, OneOf
    :undoc-members:
 
    .. autodata:: regex4seq.NONE

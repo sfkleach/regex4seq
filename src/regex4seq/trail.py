@@ -8,7 +8,7 @@ class Trail(ABC):
     def add(self, name, lo, hi, call):
         ...
 
-    def namespace(self, inputSeq, all_prefix=None) -> bool | SimpleNamespace:
+    def namespace(self, inputSeq, history=None) -> bool | SimpleNamespace:
         return True
 
     def isCapture(self) -> bool:
@@ -36,7 +36,7 @@ class CaptureTrail(Trail):
     def add(self, name, lo, hi, call) -> 'CaptureTrail':
         return CaptureTrail(name, lo, hi, call, self)
 
-    def namespace(self, inputSeq, all_prefix=None) -> bool | SimpleNamespace:
+    def namespace(self, inputSeq, history=None) -> bool | SimpleNamespace:
         ns = SimpleNamespace()
         t = self
         while t.isCapture():
@@ -45,8 +45,8 @@ class CaptureTrail(Trail):
             else:
                 value = inputSeq[t._lo:t._hi]
             setattr(ns, t._name, value)
-            if all_prefix is not None:
-                name = all_prefix + t._name
+            if history is not None and t._name in history:
+                name = history[t._name]
                 if not hasattr(ns, name):
                     setattr(ns, name, deque())
                 q = getattr(ns, name, [])
