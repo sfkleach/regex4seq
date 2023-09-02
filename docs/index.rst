@@ -41,8 +41,13 @@ whether or not a list is a sequence of strings that contain the letter 'a'.
    # iterates that pattern over the sequence.
    pattern = IfItem(lambda s: 'a' in s).repeat()
 
+   # By default '.matches' returns True if the pattern matches the entire
+   # sequence of elements. So this will return False because 'dog' does not
+   # contain 'a'.
    pattern.matches(['cat', 'dog', 'bat'])
    # False
+
+   # This will return True because the pattern matches the whole sequence.
    pattern.matches(['cat', 'bat', 'ant'])
    # True
 
@@ -53,7 +58,7 @@ this we would use the '&' operator to compose two patterns in sequence.
 
    from regex4seq import IfItem
 
-   # We can use either '&' or '.then' to concetenate two patterns.
+   # We can use either '&' or '.then' to concatenate two patterns.
    pattern = (IfItem(lambda x: x > 0) & IfItem(lambda x: x < 0)).repeat()
 
    pattern.matches([1, -1, 2, -2, 3, -3])
@@ -83,6 +88,23 @@ Composing patterns
 * Alternatively :code:`p1.otherwise(p2)`
 * :code:`p.repeat()` - matches zero or more repetitions of p. This is like the Kleene star e.g. 'x*'
 * :code:`p.optional()` - matches zero or one repetitions of p. This is like 'x?'
+
+Convenience functions and methods
+=================================
+
+* :code:`Items(\*args)` - matches a sequence of items equal to :code:`\*args`. This is a convenience function that is equivalent to :code:`Item(args[0]) & Item(args[1]) & ...`.
+* :code:`IfItems(\*predicates)` - matches a sequence here each items satisfies the correponding predicate function. This is a convenience function that is equivalent to :code:`IfItem(predicates[0]) & IfItem(predicates[1]) & ...`.
+
+
+* :code:`p.thenAny()` - matches p followed by any single item. This is a convenience method that is equivalent to :code:`p.then(ANY)`.
+* :code:`p.thenMany()` - matches p followed by zero or more items. This is a convenience method that is equivalent to :code:`p.then(MANY)`.
+
+* :code:`p.thenItems(\*args)` - matches p followed by a sequence of items equal to :code:`\*args`. This is a convenience method that is equivalent to :code:`p.then(Item(args[0]).then(Item(args[1])...`.
+* :code:`p.thenIfItems(\*predicates)` - matches p followed by a sequence here each items satisfies the correponding predicate function. This is a convenience method that is equivalent to :code:`p.then(Item(args[0]).then(Item(args[1])...`.
+* :code:`p.thenOneOf(\*args)` - matches p followed by any of the listed items. This is a convenience method that is equivalent to :code:`p.then(OneOf(args[0], args[1], ...))`.
+
+
+
 
 Matching Groups
 ===============
