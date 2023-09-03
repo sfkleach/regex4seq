@@ -2,7 +2,7 @@
 
 This is a python library that implements regular-expression based pattern matches for sequences of arbitrary objects. For example you can write pattern to determine if a list is a sequence of alternating 1's and 0's like this:
 
-```
+```py
 from regex4seq import Item, Items
 
 # The core is a repetition of alternating 0s and 1s. But we need to
