@@ -10,7 +10,7 @@ documentation="https://regex4seq.readthedocs.io/en/latest/"
 repository = "https://github.com/sfkleach/regex4seq"
 keywords = ["regex", "regular expressions", "pattern matching", "sequence matching"]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Intended Audience :: Developers",
     "Natural Language :: English",
@@ -27,7 +27,7 @@ python = "^3.10"
 pytest = "^7.4.0"
 mypy = "^1.5.1"
 sphinx = "^7.2.3"
-furo = "^2023.8.19"
+#furo = "^2023.8.19"
 
 [build-system]
 requires = ["poetry-core"]
