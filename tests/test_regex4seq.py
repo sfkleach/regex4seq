@@ -1,4 +1,4 @@
-from regex4seq import NONE, Item, IfItem, MatchGroup, OneOf, Items
+from regex4seq import NONE, ANY, Item, IfItem, MatchGroup, OneOf, Items, FAIL
 
 def test_matches_option_namespace():
     # Arrange
@@ -22,6 +22,31 @@ def test_matches_two_groups():
     # Assert
     assert ns.lhs == ['abc']
     assert ns.rhs == ['def']
+
+def test_matches_history():
+    # Arrange
+    pattern = ANY.var( "it" ).repeat()
+
+    # Act - this exercises CaptureTrail.add
+    ns = pattern.matches( [ 'abc', 'def' ], history=dict(it='all') )
+
+    # Assert
+    assert len(ns.all) == 2
+    assert [*ns.all] == [['abc'], ['def']]
+
+def test_findAllMatches():
+    # Arrange
+    pattern = ANY.var( "it" )
+
+    # Act - this exercises CaptureTrail.add
+    matches = tuple( map(lambda ns: ns.it, pattern.findAllMatches( [ 'abc', 'def', 'ghi' ], start=False, end=False ) ) )
+
+    # Assert
+    assert len(matches) == 3
+    for m in matches:
+        assert m in [ ['abc'], ['def'], ['ghi'] ]
+    for m in range(0, len(matches)):
+        assert matches[m % 3] != matches[(m+1) % 3]
 
 def test_matches_matchgroup_with_extraction():
     # Arrange
@@ -118,3 +143,9 @@ def test_then_one_of():
     assert p_one_of.matches( [ "bar" ] )
     assert p_one_of.matches( [ "baz" ] )
     assert not p_one_of.matches( [ "bar", "baz" ] )
+
+def test_fail():
+    # Act/Assert
+    assert not FAIL.matches( [] )    
+    assert not FAIL.matches( [''] )    
+    assert not FAIL.matches( ['', ''] )

@@ -52,7 +52,6 @@ class RegEx4Seq(ABC, Generic[T]):
         Many, Concatenate, Alternate, Repeat, and MatchGroup.
         :meta private:
         """
-        ...
 
     def then(self, Q: 'RegEx4Seq[T]'):
         """
@@ -374,6 +373,8 @@ ANY: AnyItem = AnyItem()
 MANY: ManyItems = ManyItems()
 # This is a singleton that matches any number of items from a sequence.
 
+FAIL: Fail = Fail()
+"""This is a pattern that is guaranteed to fail. Useful when automatically generating patterns."""
 
 def Items(*args: T):
     """
@@ -389,6 +390,3 @@ def IfItems(*args: Callable[[T], bool]):
     each satisfy the corresponding predicate.
     """
     return Empty().thenIfItems(*args)
-
-if __name__ == "__main__":
-    pass

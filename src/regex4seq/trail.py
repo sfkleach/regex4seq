@@ -6,7 +6,7 @@ class Trail(ABC):
 
     @abstractmethod
     def add(self, name, lo, hi, call):
-        ...
+        """Add a capture to the trail"""
 
     def namespace(self, inputSeq, history=None) -> bool | SimpleNamespace:
         return True
