@@ -51,6 +51,10 @@ test:
 	$(POETRY) run mypy src/regex4seq/regex4seq.py --check-untyped-defs
 	$(POETRY) run pytest tests
 
+.PHONY: coverage
+coverage:
+	$(POETRY) run pytest --cov=src --cov-report=html:coverage
+
 # ATM I do not intend for updates of the PyPI archive to be run automagically.
 # So these commands should be run locally before trying to update the PyPI
 # archives.

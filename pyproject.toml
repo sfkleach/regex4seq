@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "regex4seq"
-version = "0.3.0"
+version = "0.3.1+dev"
 description = "Regular Expressions for Sequences of Things"
 authors = ["Stephen Leach <sfkleach@gmail.com>"]
 license = "LGPL-3.0-or-later"
@@ -28,6 +28,8 @@ pytest = "^7.4.0"
 mypy = "^1.5.1"
 sphinx = "^7.2.3"
 #furo = "^2023.8.19"
+coverage = "^7.3.0"
+pytest-cov = "^4.1.0"
 
 [build-system]
 requires = ["poetry-core"]

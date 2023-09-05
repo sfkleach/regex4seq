@@ -1,73 +1,120 @@
-from regex4seq import NONE, Item, IfItem, MatchGroup
+from regex4seq import NONE, Item, IfItem, MatchGroup, OneOf, Items
 
+def test_matches_option_namespace():
+    # Arrange
+    p1 = Item( "abc" ).var( "foo" )
+
+    # Act
+    ns0 = p1.matches( [ 'abc' ] )
+    ns1 = p1.matches( [ 'abc' ], namespace=False )
+    
+    # Assert
+    assert ns0.foo == ['abc']
+    assert ns1 is True
+
+def test_matches_two_groups():
+    # Arrange
+    pattern = Item( "abc" ).var( "lhs" ).then( Item( "def" ).var( "rhs" ) )
+
+    # Act - this exercises CaptureTrail.add
+    ns = pattern.matches( [ 'abc', 'def' ] )
+
+    # Assert
+    assert ns.lhs == ['abc']
+    assert ns.rhs == ['def']
+
+def test_matches_matchgroup_with_extraction():
+    # Arrange
+    pattern = Item( "abc" ).var( "foo", extract=lambda s, lo, hi: s[lo] )
+
+    # Act/Assert
+    assert pattern.matches( [ 'abc' ] ).foo == 'abc'
 
 def test_item():
     # Arrange
-    p1 = Item("abc")
+    p1 = Item( "abc" )
 
     # Act/Assert
-    assert not p1.matches([])
-    assert p1.matches(['abc'])
-    assert not p1.matches(['abc', 'pqr'])
-    assert not p1.matches(['abxc'])
+    assert not p1.matches( [ ] )
+    assert p1.matches( [ 'abc' ] )
+    assert not p1.matches( [ 'abc', 'pqr' ] )
+    assert not p1.matches( [ 'abxc' ] )
+
 
 def test_NIL():
     # Act/Assert
-    assert NONE.matches([])
-    assert not NONE.matches(['abc'])
-    assert not NONE.matches(['abc', 'pqr'])
+    assert NONE.matches( [ ] )
+    assert not NONE.matches( [ 'abc' ] )
+    assert not NONE.matches( [ 'abc', 'pqr' ] )
+
 
 def test_concatenate():
     # Arrange
-    p1 = Item("abc")
-    p2 = p1.then(p1)
+    p1 = Item( "abc" )
+    p2 = p1.then( p1 )
 
     # Act/Assert
-    assert not p2.matches([])
-    assert not p2.matches(['abc'])
-    assert p2.matches(['abc', 'abc'])
-    assert not p2.matches(['abc', 'abc', 'pqr'])
+    assert not p2.matches( [ ] )
+    assert not p2.matches( [ 'abc' ] )
+    assert p2.matches( [ 'abc', 'abc' ] )
+    assert not p2.matches( [ 'abc', 'abc', 'pqr' ] )
+
 
 def test_testitem():
     # Arrange
-    p_int = IfItem(lambda x: isinstance(x, int))
+    p_int = IfItem( lambda x: isinstance( x, int ) )
 
     # Act/Assert
-    assert p_int.matches([5])
-    assert not p_int.matches(["foo"])
-    assert not p_int.matches([5, 6])
+    assert p_int.matches( [ 5 ] )
+    assert not p_int.matches( [ "foo" ] )
+    assert not p_int.matches( [ 5, 6 ] )
+
 
 def test_alternate():
     # Arrange
-    p_int = IfItem(lambda x: isinstance(x, int))
-    p_one_or_two = p_int.then(p_int).otherwise(p_int)
+    p_int = IfItem( lambda x: isinstance( x, int ) )
+    p_one_or_two = p_int.then( p_int ).otherwise( p_int )
 
     # Act/Assert
-    assert not p_one_or_two.matches([])
-    assert p_one_or_two.matches([5])
-    assert p_one_or_two.matches([5, 6])
-    assert not p_one_or_two.matches([5, 6, 7])
+    assert not p_one_or_two.matches( [ ] )
+    assert p_one_or_two.matches( [ 5 ] )
+    assert p_one_or_two.matches( [ 5, 6 ] )
+    assert not p_one_or_two.matches( [ 5, 6, 7 ] )
+
 
 def test_repeat():
     # Arrange
-    p_int = IfItem(lambda x: isinstance(x, int))
+    p_int = IfItem( lambda x: isinstance( x, int ) )
     p_many = p_int.repeat()
 
     # Act/Assert
-    assert p_many.matches([])
-    assert p_many.matches([5])
-    assert p_many.matches([5, 6])
-    assert p_many.matches([5, 6, 7])
-    assert not p_many.matches([5, '6', 7])
+    assert p_many.matches( [ ] )
+    assert p_many.matches( [ 5 ] )
+    assert p_many.matches( [ 5, 6 ] )
+    assert p_many.matches( [ 5, 6, 7 ] )
+    assert not p_many.matches( [ 5, '6', 7 ] )
+
 
 def test_matchgroup():
     # Arrange
-    p_int = IfItem(lambda x: isinstance(x, int))
+    p_int = IfItem( lambda x: isinstance( x, int ) )
     p_many = p_int.repeat()
-    p_group = MatchGroup("foo", p_many).then(Item("bar"))
+    p_group = MatchGroup( "foo", p_many ).then( Item( "bar" ) )
 
     # Act
-    ns = p_group.matches([1, 2, 3, "bar"], namespace=True)
+    ns = p_group.matches( [ 1, 2, 3, "bar" ] )
 
     # Assert
-    assert ns.foo == [1, 2, 3]
+    assert ns.foo == [ 1, 2, 3 ]
+
+
+def test_then_one_of():
+    # Arrange
+    p_one_of = OneOf( "foo", "bar", "baz")
+    
+    # Act/Assert
+    assert not p_one_of.matches( [] )
+    assert p_one_of.matches( [ "foo" ] )
+    assert p_one_of.matches( [ "bar" ] )
+    assert p_one_of.matches( [ "baz" ] )
+    assert not p_one_of.matches( [ "bar", "baz" ] )
