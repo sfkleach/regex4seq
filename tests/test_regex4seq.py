@@ -1,4 +1,4 @@
-from regex4seq import NONE, ANY, Item, IfItem, MatchGroup, OneOf, Items, FAIL
+from regex4seq import NONE, ANY, Item, IfItem, MatchGroup, OneOf, Items, FAIL, MANY
 
 def test_matches_option_namespace():
     # Arrange
@@ -66,7 +66,7 @@ def test_item():
     assert not p1.matches( [ 'abxc' ] )
 
 
-def test_NIL():
+def test_NONE():
     # Act/Assert
     assert NONE.matches( [ ] )
     assert not NONE.matches( [ 'abc' ] )
@@ -132,7 +132,6 @@ def test_matchgroup():
     # Assert
     assert ns.foo == [ 1, 2, 3 ]
 
-
 def test_then_one_of():
     # Arrange
     p_one_of = OneOf( "foo", "bar", "baz")
@@ -144,8 +143,34 @@ def test_then_one_of():
     assert p_one_of.matches( [ "baz" ] )
     assert not p_one_of.matches( [ "bar", "baz" ] )
 
-def test_fail():
+def test_FAIL():
     # Act/Assert
     assert not FAIL.matches( [] )    
     assert not FAIL.matches( [''] )    
     assert not FAIL.matches( ['', ''] )
+
+def test_MANY():
+    # Act/Assert
+    assert MANY.matches( [] )    
+    assert MANY.matches( [''] )    
+    assert MANY.matches( ['', 1, False] )
+
+def test_MANY_is_greedy():
+    # Arrange
+    p = MANY.var("lhs").then( Item( 'a' ) ).then( MANY )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert [*p.matches( ['a'] ).lhs] == []
+    assert [*p.matches( ['a', 'a'] ).lhs] == ['a']
+    assert [*p.matches( ['a', 'a', 'a'] ).lhs] == ['a', 'a']
+
+def test_optional():
+    # Arrange
+    p = Item('a').optional()
+
+    # Act/Assert
+    assert p.matches( [] )
+    assert p.matches( ['a'] )
+    assert not p.matches( ['b'] )
+    assert not p.matches( ['a', 'a'] )
