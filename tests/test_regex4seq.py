@@ -211,6 +211,19 @@ def test_thenItems():
     assert not p.matches( [1, 2, 3, 4] )
     assert not p.matches( [1, 4, 2, 3] )
 
+def test_Items():
+    # Arrange
+    p = Items( 1, 2, 3 )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert not p.matches( ['a'] )
+    assert not p.matches( ['a', 'b'] )
+    assert not p.matches( [22, 1, 2, 3] )
+    assert p.matches( [1, 2, 3] )
+    assert not p.matches( [1, 2, 3, 4] )
+    assert not p.matches( [1, 4, 2, 3] )
+
 def test_Item_otherwise():
     # Arrange
     p = Item('a').otherwise( Item('b') )
@@ -230,5 +243,55 @@ def test_Item_otherwise2():
     assert p.matches( ['a'] )
     assert p.matches( ['b'] )
     assert p.matches( ['c'] )
+    assert not p.matches( ['x'] )
+    assert not p.matches( ['a', 'a'] )
+
+def test_Item_otherwise3():
+    # Arrange
+    p = Item('a').otherwise( Item('b').otherwise( Item('c') ) )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert p.matches( ['a'] )
+    assert p.matches( ['b'] )
+    assert p.matches( ['c'] )
+    assert not p.matches( ['x'] )
+    assert not p.matches( ['a', 'a'] )
+
+def test_Item_otherwise4():
+    # Arrange
+    p = Item('a').otherwise( Item('b').otherwise( Item('c') ).var("") )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert p.matches( ['a'] )
+    assert p.matches( ['b'] )
+    assert p.matches( ['c'] )
+    assert not p.matches( ['x'] )
+    assert not p.matches( ['a', 'a'] )
+
+def test_OneOf_otherwise():
+    # Arrange
+    p = Item('a').otherwise( Item('b') ).otherwise( Item('c').otherwise(Item('d')) )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert p.matches( ['a'] )
+    assert p.matches( ['b'] )
+    assert p.matches( ['c'] )
+    assert p.matches( ['d'] )
+    assert not p.matches( ['x'] )
+    assert not p.matches( ['a', 'a'] )
+
+def test_OneOf_otherwise2():
+    # Arrange
+    p = Item('a').otherwise( Item('b') ).otherwise( Item('c').otherwise(Item('d')).var("") )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert p.matches( ['a'] )
+    assert p.matches( ['b'] )
+    assert p.matches( ['c'] )
+    assert p.matches( ['d'] )
     assert not p.matches( ['x'] )
     assert not p.matches( ['a', 'a'] )
