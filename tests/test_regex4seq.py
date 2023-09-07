@@ -197,3 +197,38 @@ def test_IfItems():
     assert not p.matches( ['a', 'b'] )
     assert p.matches( [22, 'ac'] )
     assert not p.matches( [1, False] )
+
+def test_thenItems():
+    # Arrange
+    p = ANY.thenItems( 1, 2, 3 )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert not p.matches( ['a'] )
+    assert not p.matches( ['a', 'b'] )
+    assert p.matches( [22, 1, 2, 3] )
+    assert not p.matches( [1, 2, 3] )
+    assert not p.matches( [1, 2, 3, 4] )
+    assert not p.matches( [1, 4, 2, 3] )
+
+def test_Item_otherwise():
+    # Arrange
+    p = Item('a').otherwise( Item('b') )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert p.matches( ['a'] )
+    assert p.matches( ['b'] )
+    assert not p.matches( ['a', 'a'] )
+
+def test_Item_otherwise2():
+    # Arrange
+    p = Item('a').otherwise( Item('b') ).otherwise( Item('c') )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert p.matches( ['a'] )
+    assert p.matches( ['b'] )
+    assert p.matches( ['c'] )
+    assert not p.matches( ['x'] )
+    assert not p.matches( ['a', 'a'] )

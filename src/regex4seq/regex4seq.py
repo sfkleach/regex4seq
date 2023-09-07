@@ -194,7 +194,7 @@ class Item(RegEx4Seq, Generic[T]):
 
     def otherwise(self, Q: RegEx4Seq[T]):
         if isinstance(Q, Item):
-            return OneOf(self, Q)
+            return OneOf(self._item, Q._item)
         elif isinstance(Q, OneOf):
             return Q.otherwise(self)
         else:
@@ -214,7 +214,7 @@ class OneOf(RegEx4Seq, Generic[T]):
 
     def otherwise(self, Q: RegEx4Seq[T]):
         if isinstance(Q, Item):
-            return OneOf(Q, self._items)
+            return OneOf(Q._item, *self._items)
         elif isinstance(Q, OneOf):
             return OneOf(*self._items, *Q._items)
         else:
