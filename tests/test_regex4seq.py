@@ -1,4 +1,4 @@
-from regex4seq import NONE, ANY, Item, IfItem, MatchGroup, OneOf, Items, FAIL, MANY, IfNext
+from regex4seq import NONE, ANY, Item, IfItem, MatchGroup, OneOf, Items, FAIL, MANY, IfNext, IfItems
 
 def test_matches_option_namespace():
     # Arrange
@@ -186,3 +186,14 @@ def test_IfNext():
     assert p.matches( ['a', 'ac'], start=False, end=False )
     assert not p.matches( ['a', 'x', 'ac'], start=False, end=False )
     assert not p.matches( ['a', 'a'], start=False, end=False )
+
+def test_IfItems():
+    # Arrange
+    p = IfItems( lambda x: isinstance(x, int), lambda x: isinstance(x, str) )
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert not p.matches( ['a'] )
+    assert not p.matches( ['a', 'b'] )
+    assert p.matches( [22, 'ac'] )
+    assert not p.matches( [1, False] )
