@@ -2,12 +2,16 @@
 
 Following the style in https://keepachangelog.com/en/1.0.0/
 
+## [0.3.2] Unit Testing 100% Coverage
+
+No further bugs found as unit test coverage was pushed to 100%. Statuc changed
+to 'Beta' to reflect that.
+
 ## [0.3.1] Bug fix
 
 ### Fixed
 
 - A significant error in the `otherwise` method has been repaired.
-
 
 ## [0.3.0] Improved and unified the matches method, 2023-08-31
 

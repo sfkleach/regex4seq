@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "regex4seq"
-version = "0.3.1"
+version = "0.3.2"
 description = "Regular Expressions for Sequences of Things"
 authors = ["Stephen Leach <sfkleach@gmail.com>"]
 license = "LGPL-3.0-or-later"
@@ -10,7 +10,7 @@ documentation="https://regex4seq.readthedocs.io/en/latest/"
 repository = "https://github.com/sfkleach/regex4seq"
 keywords = ["regex", "regular expressions", "pattern matching", "sequence matching"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
     "Intended Audience :: Developers",
     "Natural Language :: English",
