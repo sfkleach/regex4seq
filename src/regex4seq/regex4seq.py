@@ -129,12 +129,27 @@ class RegEx4Seq(ABC, Generic[T]):
         return self.then(OneOf(*items))
 
     def var(self, name, suchthat=None, extract=None):
+        """
+        Returns a new pattern that, when it matches, will capture the matched
+        subsequence into an attribute of a namespace object. The name of the
+        attribute is given by the name argument. 
+        
+        Keywords arguments:
+        suchthat - a predicate function that filters the match
+        extract argument - a function that can transform the match
+        """
         return MatchGroup(name, self, suchthat=suchthat, extract=extract)
 
     def __and__(self, Q: 'RegEx4Seq[T]'):
+        """
+        A shorthand for the method then, which can be written as P & Q.
+        """
         return self.then(Q)
 
     def __or__(self, Q: 'RegEx4Seq[T]'):
+        """
+        A shorthand for the method otherwise, which can be written as P | Q.
+        """
         return self.otherwise(Q)
 
 
