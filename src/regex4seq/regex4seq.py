@@ -198,7 +198,7 @@ class Item(RegEx4Seq, Generic[T]):
         elif isinstance(Q, OneOf):
             return Q.otherwise(self)
         else:
-            return Otherwise(self, Q)
+            return super().otherwise(Q)
 
 
 class OneOf(RegEx4Seq, Generic[T]):
@@ -218,7 +218,7 @@ class OneOf(RegEx4Seq, Generic[T]):
         elif isinstance(Q, OneOf):
             return OneOf(*self._items, *Q._items)
         else:
-            return Otherwise(self, Q)
+            return super().otherwise(Q)
 
 
 class IfNext(RegEx4Seq, Generic[T]):

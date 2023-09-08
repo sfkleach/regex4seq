@@ -65,13 +65,21 @@ def test_item():
     assert not p1.matches( [ 'abc', 'pqr' ] )
     assert not p1.matches( [ 'abxc' ] )
 
-
 def test_NONE():
     # Act/Assert
     assert NONE.matches( [ ] )
     assert not NONE.matches( [ 'abc' ] )
     assert not NONE.matches( [ 'abc', 'pqr' ] )
 
+def test_then_NONE():
+    # Arrange 
+    p =  Item( "abc" ).then(NONE)
+
+    # Act/Assert
+    assert not p.matches( [ ] )
+    assert p.matches( [ 'abc' ] )
+    assert not p.matches( [ 'abc', 'pqr' ] )
+    assert not p.matches( [ 'abxc' ] )
 
 def test_concatenate():
     # Arrange
@@ -149,6 +157,16 @@ def test_FAIL():
     assert not FAIL.matches( [''] )    
     assert not FAIL.matches( ['', ''] )
 
+def test_fancy_FAIL():
+    # Arrange
+    # Boost test coverage of construction optimisations.
+    p = FAIL.then( Item( 'a' ) ).repeat().optional().optional().repeat()
+
+    # Act/Assert
+    assert p.matches( [] )
+    assert not p.matches( ['a'] )
+    assert not p.matches( ['a', 'a'] )
+
 def test_MANY():
     # Act/Assert
     assert MANY.matches( [] )    
@@ -168,6 +186,16 @@ def test_MANY_is_greedy():
 def test_optional():
     # Arrange
     p = Item('a').optional()
+
+    # Act/Assert
+    assert p.matches( [] )
+    assert p.matches( ['a'] )
+    assert not p.matches( ['b'] )
+    assert not p.matches( ['a', 'a'] )
+
+def test_otherwise_empty():
+    # Arrange
+    p = Item('a').otherwise(NONE)
 
     # Act/Assert
     assert p.matches( [] )
@@ -295,3 +323,105 @@ def test_OneOf_otherwise2():
     assert p.matches( ['d'] )
     assert not p.matches( ['x'] )
     assert not p.matches( ['a', 'a'] )
+
+def test_thenAny():
+    # Arrange
+    p = Item('a').thenAny()
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert not p.matches( ['a'] )
+    assert p.matches( ['a', 'b'] )
+    assert not p.matches( ['a', 'b', 'c'] )
+    assert not p.matches( ['b'] )
+    assert not p.matches( ['b', 'a'] )
+
+def test_thenMany():
+    # Arrange
+    p = Item('a').thenMany().thenItems('b')
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert not p.matches( ['a'] )
+    assert p.matches( ['a', 'b'] )
+    assert not p.matches( ['a', 'b', 'c'] )
+    assert p.matches( ['a', 'x', 'b'] )
+    assert not p.matches( ['b'] )
+    assert not p.matches( ['b', 'a'] )
+
+def test_theOneOf():
+    # Arrange
+    p = Item('a').thenOneOf('b', 'c')
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert not p.matches( ['a'] )
+    assert p.matches( ['a', 'b'] )
+    assert not p.matches( ['a', 'b', 'c'] )
+    assert p.matches( ['a', 'c'] )
+    assert not p.matches( ['b'] )
+    assert not p.matches( ['b', 'a'] )
+
+def test_and():
+    # Arrange
+    p = Item('a') & Item('b')
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert not p.matches( ['a'] )
+    assert not p.matches( ['b'] )
+    assert p.matches( ['a', 'b'] )
+    assert not p.matches( ['a', 'b', 'c'] )
+
+def test_or():
+    # Arrange
+    p = Item('a') | Item('b')
+
+    # Act/Assert
+    assert not p.matches( [] )
+    assert p.matches( ['a'] )
+    assert p.matches( ['b'] )
+    assert not p.matches( ['a', 'b'] )
+    
+def test_optimise_Empty_and_Optional():
+    # Arrange
+    p = Item('a').otherwise(NONE).optional().repeat()
+
+    # Act/Assert
+    assert p.matches( [] )
+    assert p.matches( ['a'] )
+    assert p.matches( ['a', 'a'] )
+    assert not p.matches( ['a', 'b'] )
+    assert not p.matches( ['b'] )
+
+def test_optimise_Empty_and_Fail():
+    # Arrange
+    p = FAIL.otherwise(NONE.otherwise(ANY))
+
+    # Act/Assert
+    assert p.matches( [] )
+    assert p.matches( ['a'] )
+    assert not p.matches( ['a', 'a'] )
+
+def test_optimise_Any_and_Many():
+    # Arrange
+    p = ANY.repeat().repeat().optional()
+
+    # Act/Assert
+    assert p.matches( [] )
+    assert p.matches( ['a'] )
+    assert p.matches( ['a', 'a'] )
+    assert p.matches( ['a', 'b'] )
+    assert p.matches( ['b'] )
+
+def test_optimise_repeat_repeat():
+    # Arrange
+    p = Item('x').repeat().repeat()
+
+    # Act/Assert
+    assert p.matches( [] )
+    assert p.matches( ['x'] )
+    assert p.matches( ['x', 'x'] )
+    assert p.matches( ['x', 'x', 'x'] )
+    assert not p.matches( ['xx', 'x'] )    
+    assert not p.matches( ['x', 'xx'] )
