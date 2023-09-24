@@ -22,11 +22,6 @@ Welcome to RegEx4Seq's documentation!
 Introduction
 ============
 
-[WARNING: This is a work in progress as of 3rd Sept 23. I'm still working on the
-documentation and unit tests but the API is essentially stable. I have set the
-version to 0.3.0 and I have changed the project status to 'Alpha' to reflect 
-this.]
-
 RegEx4Seq is a pattern matcher that is inspired by regular expressions. It 
 allows you to write patterns that find matches in any sequence of python 
 values, such as lists, tuples or even strings. For example, we could detect

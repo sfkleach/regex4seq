@@ -2,9 +2,19 @@
 
 Following the style in https://keepachangelog.com/en/1.0.0/
 
+## [1.0.0] First Release
+
+No known bugs, full test coverage, complete basic documentation: it's time 
+for version 1.
+
+### Added
+
+- More documentation so that all public class, methods and variables are
+  documented to a basic level.
+
 ## [0.3.2] Unit Testing 100% Coverage
 
-No further bugs found as unit test coverage was pushed to 100%. Statuc changed
+No further bugs found as unit test coverage was pushed to 100%. Status changed
 to 'Beta' to reflect that.
 
 ## [0.3.1] Bug fix
