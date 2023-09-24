@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Callable, Iterator, Sequence, Any, Annotated, TypeVar, Generic
+from typing import Callable, Iterator, Sequence, Annotated, TypeVar, Generic
 from types import SimpleNamespace
 
 from .trail import Trail, DiscardTrail, StartCaptureTrail
@@ -132,8 +132,8 @@ class RegEx4Seq(ABC, Generic[T]):
         """
         Returns a new pattern that, when it matches, will capture the matched
         subsequence into an attribute of a namespace object. The name of the
-        attribute is given by the name argument. 
-        
+        attribute is given by the name argument.
+
         Keywords arguments:
         suchthat - a predicate function that filters the match
         extract argument - a function that can transform the match
@@ -142,31 +142,34 @@ class RegEx4Seq(ABC, Generic[T]):
 
     def __and__(self, Q: 'RegEx4Seq[T]'):
         """
-        A shorthand for the method then, which can be written as P & Q.
+        A shorthand for the method `P.then(Q)`, so it can be written as P & Q.
         """
         return self.then(Q)
 
     def __or__(self, Q: 'RegEx4Seq[T]'):
         """
-        A shorthand for the method otherwise, which can be written as P | Q.
+        A shorthand for the method `P.otherwise(Q)`, so it can be written as P | Q.
         """
         return self.otherwise(Q)
 
 
 class Empty(RegEx4Seq, Generic[T]):
-    """Represents a pattern that matches no items."""
+    """Represents a pattern that matches no items. Rougly equivalent to regular expressions '()'"""
 
     def _gobble(self, inputSeq: Sequence[T], idx: int, trail: Trail) -> Iterator[tuple[int, Trail]]:
         """:meta private:"""
         yield idx, trail
 
     def then(self, Q: RegEx4Seq[T]):
+        """Includes an optimization to avoid creating a nested Empty."""
         return Q
 
     def otherwise(self, Q: RegEx4Seq[T]):
+        """Includes an optimization to avoid creating a nested Empty."""
         return Q.optional()
 
     def repeat(self):
+        """Includes an optimization to avoid creating a nested Empty."""
         return self
 
     def optional(self):
@@ -174,28 +177,33 @@ class Empty(RegEx4Seq, Generic[T]):
 
 
 class Fail(RegEx4Seq, Generic[T]):
-    """Represents a pattern that never matches"""
+    """Represents a pattern that never matches. Roughly equivalent to regular expressions '[]' or '$^'"""
 
     def _gobble(self, inputSeq: Sequence[T], idx: int, trail: Trail) -> Iterator[tuple[int, Trail]]:
         """:meta private:"""
         yield from ()
 
     def then(self, Q: RegEx4Seq[T]):
+        """Includes an optimization to avoid creating a nested Fail."""
         return self
 
     def otherwise(self, Q: RegEx4Seq[T]):
+        """Includes an optimization to avoid creating a nested Fail."""
         return Q
 
     def repeat(self):
+        """Includes an optimization to avoid creating a nested Fail."""
         return self
 
     def optional(self):
+        """Includes an optimization to avoid creating a nested Fail."""
         return Empty()
 
 
 class Item(RegEx4Seq, Generic[T]):
     """
-    Wraps an item to create a pattern that matches against that item.
+    Wraps an item to create a pattern that matches against that item using
+    normal equals. If you want to use a different predicate, use IfItem.
     """
 
     def __init__(self, item: T):
@@ -208,6 +216,7 @@ class Item(RegEx4Seq, Generic[T]):
                 yield idx + 1, trail
 
     def otherwise(self, Q: RegEx4Seq[T]):
+        """Same as otherwise but includes an optimization to avoid creating a nested Item."""
         if isinstance(Q, Item):
             return OneOf(self._item, Q._item)
         elif isinstance(Q, OneOf):
@@ -217,6 +226,10 @@ class Item(RegEx4Seq, Generic[T]):
 
 
 class OneOf(RegEx4Seq, Generic[T]):
+    """
+    This is a pattern that matches against any one of the supplied items using
+    equals. Very roughly equivalent to '[abc]' in regular expressions.
+    """
 
     def __init__(self, *items: T):
         self._items = set(items)
@@ -228,6 +241,7 @@ class OneOf(RegEx4Seq, Generic[T]):
                 yield idx + 1, trail
 
     def otherwise(self, Q: RegEx4Seq[T]):
+        """Same as otherwise but includes an optimization to avoid creating a nested OneOf."""
         if isinstance(Q, Item):
             return OneOf(Q._item, *self._items)
         elif isinstance(Q, OneOf):
@@ -237,6 +251,11 @@ class OneOf(RegEx4Seq, Generic[T]):
 
 
 class IfNext(RegEx4Seq, Generic[T]):
+    """
+    This is a pattern that matches against any two items that satisfy the given
+    predicate function. The predicate function is given two items and returns
+    a value which is treated as boolean.
+    """
 
     def __init__(self, predicateFunction: Callable[[T, T], bool]):
         self._pf: Callable[[T, T], bool] = predicateFunction
@@ -250,7 +269,10 @@ class IfNext(RegEx4Seq, Generic[T]):
 
 # Predicate is any function that given an inputSeq returns a bool.
 class IfItem(RegEx4Seq, Generic[T]):
-    """Wraps a predicate function to create a pattern that matches against any item that satisfies the predicate."""
+    """
+    Wraps a predicate function to create a pattern that matches against any item
+    that satisfies the predicate.
+    """
     __test__ = False # Ignore this class in pytest.
 
     def __init__(self, predicateFunction: Callable[[T], bool]):
@@ -264,6 +286,10 @@ class IfItem(RegEx4Seq, Generic[T]):
 
 
 class AnyItem(RegEx4Seq, Generic[T]):
+    """
+    This is a pattern that matches unconditionally against any one item from a 
+    sequence. Roughly equivalent to '.' in regular expressions.
+    """
 
     def _gobble(self, inputSeq: Sequence[T], idx: int, trail: Trail) -> Iterator[tuple[int, Trail]]:
         """:meta private:"""
@@ -271,10 +297,15 @@ class AnyItem(RegEx4Seq, Generic[T]):
             yield idx + 1, trail
 
     def repeat(self):
+        """Includes an optimization to use ManyItems rather than Repeat."""
         return ManyItems()
 
 
 class ManyItems(RegEx4Seq, Generic[T]):
+    """
+    This is a pattern that matches unconditionally against any number of items 
+    from a sequence. Roughly equivalent to '.*' in regular expressions.
+    """
 
     def _gobble(self, inputSeq: Sequence[T], idx: int, trail: Trail) -> Iterator[tuple[int, Trail]]:
         """:meta private:"""
@@ -282,13 +313,19 @@ class ManyItems(RegEx4Seq, Generic[T]):
             yield i, trail
 
     def repeat(self):
+        """Includes an optimization to avoid creating a nested ManyItems."""
         return self
 
     def optional(self):
+        """Includes an optimization to avoid creating a nested ManyItems."""
         return self
 
 
 class Optional(RegEx4Seq, Generic[T]):
+    """
+    This is a pattern that matches zero or one occurences of the original
+    pattern.
+    """
 
     def __init__(self, original: RegEx4Seq[T]):
         self._original: RegEx4Seq = original
@@ -301,9 +338,11 @@ class Optional(RegEx4Seq, Generic[T]):
         yield idx, trail
 
     def optional(self):
+        """Includes an optimization to avoid creating a nested Optional."""
         return self
 
     def repeat(self):
+        """Includes an optimization to avoid creating a nested Optional."""
         return self._original.repeat()
 
 
@@ -356,6 +395,7 @@ class Repeat(RegEx4Seq, Generic[T]):
         yield idx, trail
 
     def repeat(self):
+        """Includes an optimization to avoid creating a nested Repeat."""
         return self
 
 
@@ -384,9 +424,8 @@ NONE: Annotated[Empty, """This is a singleton that matches the empty sequence.""
 ANY: AnyItem = AnyItem()
 """This is a singleton that matches any one item from a sequence."""
 
-# Ahead of it.
 MANY: ManyItems = ManyItems()
-# This is a singleton that matches any number of items from a sequence.
+"""This is a singleton that matches any number of items from a sequence."""
 
 FAIL: Fail = Fail()
 """This is a pattern that is guaranteed to fail. Useful when automatically generating patterns."""
@@ -400,8 +439,8 @@ def Items(*args: T):
 
 def IfItems(*args: Callable[[T], bool]):
     """
-    This is a convenience function that given a sequence of predicate 
-    functions returns a pattern that match a sequence of items that 
+    This is a convenience function that given a sequence of predicate
+    functions returns a pattern that match a sequence of items that
     each satisfy the corresponding predicate.
     """
     return Empty().thenIfItems(*args)
