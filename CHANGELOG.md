@@ -2,6 +2,8 @@
 
 Following the style in https://keepachangelog.com/en/1.0.0/
 
+## [1.0.1] Update dependencies & add Justfile
+
 ## [1.0.0] First Release
 
 No known bugs, full test coverage, complete basic documentation: it's time 
