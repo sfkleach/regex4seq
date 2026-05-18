@@ -6,9 +6,18 @@ expected_version="${1:-}"
 
 # `|| true` keeps grep's empty-result exit code from tripping `set -e` before
 # we get a chance to print a useful error message.
-heading=$(grep -m1 '^## \[[0-9]\+\.[0-9]\+\.[0-9]\+\]' CHANGELOG.md || true)
+# Grab the FIRST `## ` heading, then assert it's versioned. Doing it in this
+# order means an unreleased/non-versioned top entry is detected as a failure
+# instead of being silently skipped over.
+heading=$(grep -m1 '^## ' CHANGELOG.md || true)
 if [ -z "$heading" ]; then
-  echo "No versioned entry found in CHANGELOG.md - top entry must be [X.Y.Z] not Unreleased"
+  echo "No '## ' heading found in CHANGELOG.md"
+  exit 1
+fi
+
+if ! echo "$heading" | grep -qE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]'; then
+  echo "Top CHANGELOG entry must be versioned [X.Y.Z], not unreleased"
+  echo "Found: $heading"
   exit 1
 fi
 
