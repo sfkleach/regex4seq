@@ -19,7 +19,7 @@ jobs:
         run: bash scripts/pre-release-check.sh "${GITHUB_REF_NAME#v}"
 
       - name: Sync dependencies
-        run: uv sync
+        run: uv sync --frozen
 
       - name: Test
         run: just test

@@ -2,12 +2,18 @@
 
 Following the style in https://keepachangelog.com/en/1.0.0/
 
-## [1.0.2] Switch to uv and updated dependencies, 2026-05-18
+## [2.0.0] Switch to uv, drop Python 3.10/3.11 support, 2026-05-18
+
+### Removed
+
+- **BREAKING**: Dropped support for Python 3.10 and 3.11. The minimum
+  supported Python version is now 3.12. Users on 3.10 or 3.11 should
+  pin to `regex4seq<2`.
 
 ### Changed
 
 - Switched from poetry to uv
-- Updated dependencies
+- Updated dependencies (pytest, mypy, Sphinx, coverage, pytest-cov)
 - Switched from CircleCI to GitHub CI workflow & added release workflow
 - Removed Makefile in favour of using `just` in the workflows
 
