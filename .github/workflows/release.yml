@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: extractions/setup-just@v2
+
+      - name: Check CHANGELOG matches tag
+        run: bash scripts/pre-release-check.sh "${GITHUB_REF_NAME#v}"
+
+      - name: Sync dependencies
+        run: uv sync
+
+      - name: Test
+        run: just test
+
+      - name: Extract release notes
+        run: |
+          awk 'found && /^## /{exit} /^## \[/{found=1; next} found{print}' CHANGELOG.md \
+            > release-notes.md
+          if [ ! -s release-notes.md ]; then
+            echo "Could not extract release notes from CHANGELOG.md"
+            exit 1
+          fi
+
+      - name: Build
+        run: uv build
+
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            --title "Release $GITHUB_REF_NAME" \
+            --notes-file release-notes.md \
+            dist/*
+
+      - name: Publish to PyPI
+        # Requires UV_PUBLISH_TOKEN secret configured with PyPI API token
+        run: uv publish
+        env:
+          UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}

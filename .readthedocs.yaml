@@ -1,24 +1,20 @@
-# Taken from https://github.com/readthedocs/readthedocs.org/issues/4912
+# Read the Docs configuration file. See https://docs.readthedocs.io/en/stable/config-file/v2.html
+# Uses uv (https://docs.astral.sh/uv/) for dependency management.
 
-# Required for all RTD YAML config.
 version: 2
 
-# Set-up for a poetry based installation.
 build:
-  os: ubuntu-22.04
-  tools: {python: "3.10"}
+  os: ubuntu-24.04
+  tools:
+    python: "3.12"
   jobs:
-    pre_create_environment:
-      - asdf plugin add poetry
-      - asdf install poetry latest
-      - asdf global poetry latest
-      - poetry config virtualenvs.create false
+    post_create_environment:
+      # Install uv inside RTD's auto-created virtualenv so we can use it
+      # to sync the project's dependencies into that same environment.
+      - pip install uv
     post_install:
-      - poetry install
-
-python:
-  install:
-  - requirements: docs/requirements.txt
+      # Install project + dev group (Sphinx, etc.) into the active env.
+      - UV_PROJECT_ENVIRONMENT=$READTHEDOCS_VIRTUALENV_PATH uv sync --frozen
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:

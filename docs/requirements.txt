@@ -1,3 +1,0 @@
-# packages for RTD to pick up (not used for local dev)
-# Furo commented out in favour of a light theme.
-#furo>=2023.8.19
