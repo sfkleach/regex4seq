@@ -1,6 +1,6 @@
 # Welcome to RegEx4Seq
 
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/sfkleach/lazychains/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/sfkleach/lazychains/tree/main) [![Documentation Status](https://readthedocs.org/projects/lazychains/badge/?version=latest)](https://lazychains.readthedocs.io/en/latest/?badge=latest)
+[![CI](https://github.com/sfkleach/regex4seq/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sfkleach/regex4seq/actions/workflows/ci.yml) [![Documentation Status](https://readthedocs.org/projects/regex4seq/badge/?version=latest)](https://regex4seq.readthedocs.io/en/latest/?badge=latest)
 
 This is a python library that implements regular-expression based pattern matches for sequences of arbitrary objects. For example you can write pattern to determine if a list is a sequence of alternating 1's and 0's like this:
 

@@ -95,7 +95,7 @@ def test_concatenate():
 
 def test_testitem():
     # Arrange
-    p_int = IfItem( lambda x: isinstance( x, int ) )
+    p_int: IfItem[object] = IfItem( lambda x: isinstance( x, int ) )
 
     # Act/Assert
     assert p_int.matches( [ 5 ] )
@@ -105,7 +105,7 @@ def test_testitem():
 
 def test_alternate():
     # Arrange
-    p_int = IfItem( lambda x: isinstance( x, int ) )
+    p_int: IfItem[object] = IfItem( lambda x: isinstance( x, int ) )
     p_one_or_two = p_int.then( p_int ).otherwise( p_int )
 
     # Act/Assert
@@ -117,7 +117,7 @@ def test_alternate():
 
 def test_repeat():
     # Arrange
-    p_int = IfItem( lambda x: isinstance( x, int ) )
+    p_int: IfItem[object] = IfItem( lambda x: isinstance( x, int ) )
     p_many = p_int.repeat()
 
     # Act/Assert
@@ -130,7 +130,7 @@ def test_repeat():
 
 def test_matchgroup():
     # Arrange
-    p_int = IfItem( lambda x: isinstance( x, int ) )
+    p_int: IfItem[object] = IfItem( lambda x: isinstance( x, int ) )
     p_many = p_int.repeat()
     p_group = MatchGroup( "foo", p_many ).then( Item( "bar" ) )
 
@@ -205,7 +205,7 @@ def test_otherwise_empty():
 
 def test_IfNext():
     # Arrange
-    p = IfNext( lambda x, y: x[0] == y[0] and x != y )
+    p: IfNext[str] = IfNext( lambda x, y: x[0] == y[0] and x != y )
 
     # Act/Assert
     assert not p.matches( [], start=False, end=False )
