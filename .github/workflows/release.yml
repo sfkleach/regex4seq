@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      id-token: write  # ← ADD THIS for OIDC trusted publishing
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5  # v4
       - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
@@ -46,7 +47,4 @@ jobs:
             dist/*
 
       - name: Publish to PyPI
-        # Requires UV_PUBLISH_TOKEN secret configured with PyPI API token
-        run: uv publish
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.UV_PUBLISH_TOKEN }}
+        run: uv publish --trusted-publishing always

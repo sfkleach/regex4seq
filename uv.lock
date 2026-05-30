@@ -531,7 +531,7 @@ wheels = [
 
 [[package]]
 name = "regex4seq"
-version = "1.0.2"
+version = "2.0.1"
 source = { editable = "." }
 
 [package.dev-dependencies]

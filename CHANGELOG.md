@@ -2,6 +2,14 @@
 
 Following the style in https://keepachangelog.com/en/1.0.0/
 
+## [2.0.1] Switch to trusted publication, 2026-05-30
+
+### Added
+
+- Changing the publication of the PyPI package to use trusted
+  publication, enabling a verified link on the PyPI site for the
+  origni repo.
+
 ## [2.0.0] Switch to uv, drop Python 3.10/3.11 support, 2026-05-18
 
 ### Removed
